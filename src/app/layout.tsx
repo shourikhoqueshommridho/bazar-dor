@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
+import Navbar from "@/components/Navbar";
+import MarketTicker from "@/components/MarketTicker";
+import { Suspense } from "react";
+import Footer from "@/components/Footer";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -23,7 +26,23 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        
+<Navbar />
+
+<Suspense
+  fallback={
+    <div className="bg-green-700 px-5 py-2 text-sm text-white">
+      বাজার দর লোড হচ্ছে...
+    </div>
+  }
+>
+  <MarketTicker />
+  
+</Suspense>
+{children}
+<Footer/>
+        </body>
     </html>
   );
 }
