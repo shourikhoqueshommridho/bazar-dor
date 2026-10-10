@@ -7,7 +7,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import CategoryNavLink from "./CategoryNavLink";
-
+import MarketTicker from "./MarketTicker";
 type Category = {
   id: string | number;
   nameBn: string;
@@ -246,6 +246,7 @@ useEffect(() => {
           </div>
         </div>
       </nav>
+      <MarketTicker />
     </header>
   );
 }

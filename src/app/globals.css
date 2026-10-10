@@ -1,3 +1,27 @@
 @import "tailwindcss";
 @plugin "daisyui";
 @import "@heroui/styles";
+
+.market-ticker-track {
+  animation: market-ticker-scroll 35s linear infinite;
+}
+
+.market-ticker-track:hover {
+  animation-play-state: paused;
+}
+
+@keyframes market-ticker-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .market-ticker-track {
+    animation: none;
+  }
+}
