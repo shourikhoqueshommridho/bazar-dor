@@ -72,6 +72,20 @@ export default function Navbar() {
       console.error("Sign out failed:", error);
     }
   };
+ 
+const [today, setToday] = useState("");
+
+useEffect(() => {
+  const formattedDate = new Intl.DateTimeFormat("bn-BD", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date());
+
+  setToday(formattedDate);
+}, []);
+
 
   return (
     <header className="bg-white">
@@ -96,8 +110,8 @@ export default function Navbar() {
                 </h1>
 
                 <p className="text-xs text-gray-500">
-                  শনিবার, ১০ অক্টোবর, ২০২৬
-                </p>
+  {today}
+</p>
               </div>
             </Link>
           </div>
