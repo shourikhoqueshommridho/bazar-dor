@@ -3,7 +3,7 @@
 @import "@heroui/styles";
 
 .market-ticker-track {
-  animation: market-ticker-scroll 35s linear infinite;
+  animation: market-ticker-scroll 60s linear infinite;
 }
 
 .market-ticker-track:hover {

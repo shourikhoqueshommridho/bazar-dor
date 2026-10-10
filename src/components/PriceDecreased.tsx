@@ -15,7 +15,7 @@ type Product = {
 
 async function getProducts(): Promise<Product[]> {
   const res = await fetch(
-    "https://api.abcz.workers.dev/api/bazardor/products",
+    "https://openapi.programming-hero.com/api/bazardor/products",
     { cache: "no-store" }
   );
 

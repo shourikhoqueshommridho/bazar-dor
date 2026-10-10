@@ -1,7 +1,7 @@
 
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
@@ -13,7 +13,11 @@ export default function SignInPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<
+    "google" | "github" | null
+  >(null);
 
+  // Email ও password দিয়ে Sign In
   const handleSignIn = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
@@ -35,25 +39,40 @@ export default function SignInPage() {
 
       router.push("/");
       router.refresh();
-    } catch {
+    } catch (err) {
+      console.error("Email sign-in error:", err);
       setError("লগইন করা যায়নি। আবার চেষ্টা করো।");
     } finally {
       setLoading(false);
     }
   };
 
+  // Google ও GitHub দিয়ে Sign In
   const handleSocialSignIn = async (
     provider: "google" | "github"
   ) => {
     setError("");
+    setSocialLoading(provider);
 
     try {
-      await authClient.signIn.social({
+      const result = await authClient.signIn.social({
         provider,
         callbackURL: "/",
       });
-    } catch {
-      setError(`${provider} দিয়ে লগইন করা যায়নি।`);
+
+      if (result.error) {
+        setError(
+          result.error.message ||
+            `${provider === "google" ? "Google" : "GitHub"} দিয়ে লগইন করা যায়নি।`
+        );
+      }
+    } catch (err) {
+      console.error(`${provider} sign-in error:`, err);
+      setError(
+        `${provider === "google" ? "Google" : "GitHub"} দিয়ে লগইন করা যায়নি।`
+      );
+    } finally {
+      setSocialLoading(null);
     }
   };
 
@@ -105,7 +124,7 @@ export default function SignInPage() {
                 id="password"
                 type="password"
                 autoComplete="current-password"
-                placeholder="কমপক্ষে ৮ অক্ষর"
+                placeholder="তোমার পাসওয়ার্ড"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
@@ -124,7 +143,7 @@ export default function SignInPage() {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || socialLoading !== null}
               className="w-full rounded-lg bg-[#07883f] py-3 font-semibold text-white shadow-md transition hover:bg-[#067334] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {loading ? "লগইন হচ্ছে..." : "সাইন ইন"}
@@ -141,19 +160,25 @@ export default function SignInPage() {
             <button
               type="button"
               onClick={() => handleSocialSignIn("google")}
-              className="flex items-center justify-center gap-2 rounded-lg border border-[#dce6de] px-3 py-2.5 text-sm font-semibold text-[#263229] transition hover:bg-[#f3f7f4]"
+              disabled={loading || socialLoading !== null}
+              className="flex items-center justify-center gap-2 rounded-lg border border-[#dce6de] px-3 py-2.5 text-sm font-semibold text-[#263229] transition hover:bg-[#f3f7f4] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <span className="font-bold text-base">G</span>
-              Google দিয়ে লগইন
+              <span className="text-base font-bold">G</span>
+              {socialLoading === "google"
+                ? "Google-এ যাচ্ছেন..."
+                : "Google দিয়ে লগইন"}
             </button>
 
             <button
               type="button"
               onClick={() => handleSocialSignIn("github")}
-              className="flex items-center justify-center gap-2 rounded-lg border border-[#dce6de] px-3 py-2.5 text-sm font-semibold text-[#263229] transition hover:bg-[#f3f7f4]"
+              disabled={loading || socialLoading !== null}
+              className="flex items-center justify-center gap-2 rounded-lg border border-[#dce6de] px-3 py-2.5 text-sm font-semibold text-[#263229] transition hover:bg-[#f3f7f4] disabled:cursor-not-allowed disabled:opacity-60"
             >
               <span aria-hidden="true">◉</span>
-              GitHub দিয়ে লগইন
+              {socialLoading === "github"
+                ? "GitHub-এ যাচ্ছেন..."
+                : "GitHub দিয়ে লগইন"}
             </button>
           </div>
 

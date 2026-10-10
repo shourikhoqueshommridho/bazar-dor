@@ -13,10 +13,10 @@ type Product = {
 };
 
 async function getProducts(): Promise<Product[]> {
-  const res = await fetch(
-    "https://api.abcz.workers.dev/api/bazardor/products",
-    { cache: "no-store" }
-  );
+ const res = await fetch(
+  "https://openapi.programming-hero.com/api/bazardor/products",
+  { cache: "no-store" }
+);
 
   if (!res.ok) {
     throw new Error("Products fetch failed");

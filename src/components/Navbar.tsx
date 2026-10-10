@@ -246,7 +246,7 @@ useEffect(() => {
           </div>
         </div>
       </nav>
-      <MarketTicker />
+     
     </header>
   );
 }
