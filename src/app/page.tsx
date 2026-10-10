@@ -16,7 +16,7 @@ export default function Home() {
 <Suspense fallback={ <p className="py-10 text-center"> পণ্যের তথ্য লোড হচ্ছে... </p> } > <PriceDecreased /> 
     </Suspense>
     <Suspense fallback={<p>সব পণ্য লোড হচ্ছে...</p>}>
-  <AllProducts />
+  <AllProducts/>
 </Suspense>
   </main>
   );

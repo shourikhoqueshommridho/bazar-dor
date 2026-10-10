@@ -1,7 +1,7 @@
 
 import CategoryProducts from "./CategoryProducts";
 
-const API = "https://api.api-store.workers.dev/api/bazardor";
+const API = "https://api.abcz.workers.dev/api/bazardor/categories";
 
 type Product = {
   id: string | number;

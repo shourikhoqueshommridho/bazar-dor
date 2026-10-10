@@ -99,10 +99,11 @@ export default function ProfilePage() {
         <section className="flex flex-col gap-5 rounded-2xl border border-[#dce6dd] bg-[#fbfdfb] p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
           <div className="flex min-w-0 items-center gap-4">
             {user.image ? (
+              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={user.image}
                 alt={user.name || "প্রোফাইল ছবি"}
-                className="h-[72px] w-[72px] shrink-0 rounded-2xl object-cover"
+                className="h-18 w-18 shrink-0 rounded-2xl object-cover"
               />
             ) : (
               <div className="flex h-[72px] w-[72px] shrink-0 items-center justify-center rounded-2xl bg-[#e5eee6] text-3xl font-bold text-[#078b43]">
