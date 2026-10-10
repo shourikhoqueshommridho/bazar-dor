@@ -1,13 +1,12 @@
+
 "use client";
-import { Suspense } from "react";
-import CategoryNavLink from "./CategoryNavLink";
 
-import { usePathname } from "next/navigation";
-import { Autour_One } from "next/font/google";
-import Image from "next/image";
-import Link from "next/link";
 import { useEffect, useState } from "react";
-
+import Link from "next/link";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import CategoryNavLink from "./CategoryNavLink";
 
 type Category = {
   id: string | number;
@@ -19,6 +18,18 @@ type Category = {
 export default function Navbar() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+
+  const router = useRouter();
+
+  // Better Auth session
+  const { data: session, isPending } = authClient.useSession();
+  const isLoggedIn = !!session?.user;
+
+  const userName = session?.user?.name || "ব্যবহারকারী";
+  const userEmail = session?.user?.email || "";
+  const userImage = session?.user?.image;
+
+  // Fetch categories from API
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -30,9 +41,18 @@ export default function Navbar() {
           throw new Error("Failed to fetch categories");
         }
 
-        const data: Category[] = await res.json();
+        const data = await res.json();
 
-        setCategories(data);
+        // API response array অথবা object—দুই ক্ষেত্রেই সামলাবে
+        const categoryList = Array.isArray(data)
+          ? data
+          : Array.isArray(data.categories)
+            ? data.categories
+            : Array.isArray(data.data)
+              ? data.data
+              : [];
+
+        setCategories(categoryList);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }
@@ -41,24 +61,33 @@ export default function Navbar() {
     fetchCategories();
   }, []);
 
+  // Sign out
+  const handleSignOut = async () => {
+    try {
+      await authClient.signOut();
+      setUserMenuOpen(false);
+      router.push("/");
+      router.refresh();
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
+
   return (
     <header className="bg-white">
-      {/* ================= Main Navbar ================= */}
+      {/* Main Navbar */}
       <div className="border-b border-gray-100">
         <div className="navbar mx-auto max-w-7xl px-4 lg:px-8">
           {/* Logo */}
           <div className="navbar-start">
-            <Link
-              href="/"
-              className="flex items-center gap-3"
-            >
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-400">
-               <Image
-  src="/images/🛒.png"
-  alt="বাজার দর"
-  width={30}
-  height={30}
-/>
+            <Link href="/" className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-green-600">
+                <Image
+                  src="/images/🛒.png"
+                  alt="বাজার দর"
+                  width={30}
+                  height={30}
+                />
               </div>
 
               <div>
@@ -67,103 +96,142 @@ export default function Navbar() {
                 </h1>
 
                 <p className="text-xs text-gray-500">
-                  সোমবার, ৬ অক্টোবর, ২০২৬
+                  শনিবার, ১০ অক্টোবর, ২০২৬
                 </p>
               </div>
             </Link>
           </div>
 
-          {/* User Menu */}
+          {/* Right Side: Auth Buttons or Profile */}
           <div className="navbar-end relative">
-            <button
-              type="button"
-              onClick={() => setUserMenuOpen(!userMenuOpen)}
-              className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-gray-50"
-            >
-              <Image
-                src="/profile.png"
-                alt="Profile"
-                width={36}
-                height={36}
-                className="rounded-full object-cover"
+            {isPending ? (
+              <div
+                className="h-10 w-24 animate-pulse rounded-lg bg-gray-100"
+                aria-label="লোড হচ্ছে"
               />
+            ) : !isLoggedIn ? (
+              /* Logged out */
+              <div className="flex items-center gap-2 sm:gap-4">
+                <Link
+                  href="/sign-in"
+                  className="rounded-lg px-2 py-2 text-sm font-semibold text-gray-800 transition hover:text-green-700 sm:px-3"
+                >
+                  সাইন ইন
+                </Link>
 
-              <div className="hidden text-left sm:block">
-                <p className="text-sm font-semibold text-gray-800">
-                  Rezwan
-                </p>
-
-                <p className="text-xs text-gray-500">
-                  Profile
-                </p>
+                <Link
+                  href="/sign-up"
+                  className="rounded-lg bg-green-700 px-3 py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-green-800 sm:px-5"
+                >
+                  সাইন আপ
+                </Link>
               </div>
+            ) : (
+              /* Logged in */
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setUserMenuOpen((prev) => !prev)}
+                  aria-expanded={userMenuOpen}
+                  aria-label="প্রোফাইল মেনু"
+                  className="flex items-center gap-2 rounded-xl px-2 py-1.5 transition hover:bg-gray-50"
+                >
+                  {userImage ? (
+                    <img
+                      src={userImage}
+                      alt="Profile"
+                      referrerPolicy="no-referrer"
+                      className="h-9 w-9 rounded-full border border-gray-200 object-cover"
+                    />
+                  ) : (
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-100 font-bold text-green-800">
+                      {userName.charAt(0).toUpperCase()}
+                    </div>
+                  )}
 
-              <span
-                className={`ml-1 text-xs text-gray-400 transition-transform ${
-                  userMenuOpen ? "rotate-180" : ""
-                }`}
-              >
-                ▼
-              </span>
-            </button>
+                  <div className="hidden text-left sm:block">
+                    <p className="max-w-32 truncate text-sm font-semibold text-gray-800">
+                      {userName}
+                    </p>
 
-            {/* Dropdown Menu */}
-            {userMenuOpen && (
-              <div className="absolute right-0 top-14 z-50 w-52 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg">
-                <div className="border-b border-gray-100 px-4 py-3">
-                  <p className="text-sm font-semibold text-gray-900">
-                    Rezwan
-                  </p>
+                    <p className="text-xs text-gray-500">
+                      প্রোফাইল
+                    </p>
+                  </div>
 
-                  <p className="text-xs text-gray-500">
-                    Welcome back!
-                  </p>
-                </div>
-
-                <div className="p-2">
-                  <Link
-                    href="/profile"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700 transition hover:bg-green-50 hover:text-green-600"
+                  <span
+                    className={`ml-1 text-xs text-gray-400 transition-transform ${
+                      userMenuOpen ? "rotate-180" : ""
+                    }`}
                   >
-                    <span className="text-base">👤</span>
-                    <span>প্রোফাইল</span>
-                  </Link>
+                    ▼
+                  </span>
+                </button>
 
-                  <button
-                    type="button"
-                    onClick={() => setUserMenuOpen(false)}
-                    className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-gray-700 transition hover:bg-red-50 hover:text-red-500"
-                  >
-                    <span className="text-base">🚪</span>
-                    <span>সাইন আউট</span>
-                  </button>
-                </div>
+                {/* Profile Dropdown */}
+                {userMenuOpen && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label="মেনু বন্ধ করুন"
+                      className="fixed inset-0 z-40 cursor-default"
+                      onClick={() => setUserMenuOpen(false)}
+                    />
+
+                    <div className="absolute right-0 top-14 z-50 w-64 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg">
+                      <div className="border-b border-gray-100 px-4 py-3">
+                        <p className="truncate text-sm font-semibold text-gray-900">
+                          {userName}
+                        </p>
+
+                        <p className="mt-1 break-all text-xs text-gray-500">
+                          {userEmail}
+                        </p>
+                      </div>
+
+                      <div className="p-2">
+                        <Link
+                          href="/profile"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-700 transition hover:bg-green-50 hover:text-green-700"
+                        >
+                          <span>👤</span>
+                          <span>প্রোফাইল</span>
+                        </Link>
+
+                        <button
+                          type="button"
+                          onClick={handleSignOut}
+                          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm text-gray-700 transition hover:bg-red-50 hover:text-red-600"
+                        >
+                          <span>🚪</span>
+                          <span>সাইন আউট</span>
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* ================= Category Navigation ================= */}
-      
-<nav className="border-b border-gray-100 bg-white">
-  <div className="mx-auto max-w-7xl px-4 lg:px-8">
-    <div className="flex items-center justify-center gap-2 overflow-x-auto py-3">
-     
-{categories.map((category) => (
-  <CategoryNavLink
-    key={category.slug}
-    slug={category.slug}
-    nameBn={category.nameBn}
-    icon={category.icon}
-  />
-))}
-    </div>
-  </div>
-</nav>
-
-
+      {/* Category Navigation */}
+      <nav className="border-b border-gray-100 bg-white">
+        <div className="mx-auto max-w-7xl px-4 lg:px-8">
+          <div className="flex items-center justify-start gap-2 overflow-x-auto py-3 sm:justify-center">
+            {categories.map((category) => (
+              <CategoryNavLink
+                key={category.slug}
+                slug={category.slug}
+                nameBn={category.nameBn}
+                icon={category.icon}
+              />
+            ))}
+          </div>
+        </div>
+      </nav>
     </header>
   );
 }
