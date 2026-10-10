@@ -1,4 +1,3 @@
-
 import { betterAuth } from "better-auth";
 import { mongodbAdapter } from "better-auth/adapters/mongodb";
 import client from "./mongodb";
@@ -6,7 +5,10 @@ import client from "./mongodb";
 const db = client.db("bazar_dor_db");
 
 export const auth = betterAuth({
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
+  baseURL:
+    process.env.BETTER_AUTH_URL ||
+    process.env.NEXT_PUBLIC_APP_URL ||
+    "http://localhost:3000",
 
   database: mongodbAdapter(db, {
     client,
@@ -35,7 +37,6 @@ export const auth = betterAuth({
             clientId: process.env.GITHUB_CLIENT_ID,
             clientSecret: process.env.GITHUB_CLIENT_SECRET,
           },
-       
         }
       : {}),
   },

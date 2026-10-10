@@ -1,7 +1,7 @@
 
 "use client";
 
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -59,10 +59,10 @@ export default function SignInPage() {
         );
         return;
       }
-
-     toast.success("সফলভাবে লগইন হয়েছে!", {
-  duration: 10000,
+toast.success("সফলভাবে লগইন হয়েছে!", {
+  autoClose: 5000,
 });
+     
 
       router.replace("/");
       router.refresh();
