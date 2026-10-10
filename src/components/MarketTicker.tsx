@@ -3,6 +3,9 @@ import MarqueeText from "react-marquee-text";
 import "react-marquee-text/dist/styles.css";
 
 interface Product {
+  market: ReactNode;
+  min: ReactNode;
+  max: ReactNode;
   nameBn: string;
   id: string | number;
   name: string;
@@ -12,7 +15,7 @@ interface Product {
 
 const Marquee = async () => {
   const res = await fetch(
-    "https://api.abcz.workers.dev/api/bazardor/products"
+    "https://api.api-store.workers.dev/api/bazardor/products"
   );
 
 const data = await res.json();
@@ -40,12 +43,12 @@ const products: Product[] = Array.isArray(data)
           direction="right"
           duration={10}
         >
-          {products.map((product) => (
-            <span key={product.id}>
-              {product.nameBn}{product.price} টাকা/{product.unit}
-              <span className="mx-5">•</span>
-            </span>
-          ))}
+         {products.map((product) => (
+  <span key={product.id}>
+    {product.nameBn} {product.market} {product.today} টাকা/{product.unit}
+    <span className="mx-5">•</span>
+  </span>
+))}
         </MarqueeText>
       </div>
     </div>

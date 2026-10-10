@@ -1,5 +1,8 @@
 "use client";
+import { Suspense } from "react";
+import CategoryNavLink from "./CategoryNavLink";
 
+import { usePathname } from "next/navigation";
 import { Autour_One } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
@@ -16,12 +19,11 @@ type Category = {
 export default function Navbar() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
-
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const res = await fetch(
-          "https://api.abcz.workers.dev/api/bazardor/categories"
+          "https://api.api-store.workers.dev/api/bazardor/categories"
         );
 
         if (!res.ok) {
@@ -144,27 +146,24 @@ export default function Navbar() {
       </div>
 
       {/* ================= Category Navigation ================= */}
-      <nav className="border-b border-gray-100 bg-white">
-        <div className="mx-auto max-w-7xl px-4 lg:px-8">
-          <div className="flex items-center justify-center gap-2 overflow-x-auto py-3">
-            {categories.map((category) => (
-              <Link
-                key={category.id}
-                href={`/category/${category.slug}`}
-                className="group flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-green-50 hover:text-green-600"
-              >
-                {/* Category Icon */}
-                <span className="flex h-8 w-8 items-center justify-center rounded-md bg-gray-50 text-lg transition group-hover:bg-white">
-                  {category.icon || "📦"}
-                </span>
+      
+<nav className="border-b border-gray-100 bg-white">
+  <div className="mx-auto max-w-7xl px-4 lg:px-8">
+    <div className="flex items-center justify-center gap-2 overflow-x-auto py-3">
+     
+{categories.map((category) => (
+  <CategoryNavLink
+    key={category.slug}
+    slug={category.slug}
+    nameBn={category.nameBn}
+    icon={category.icon}
+  />
+))}
+    </div>
+  </div>
+</nav>
 
-                {/* Category Name */}
-                <span>{category.nameBn}</span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </nav>
+
     </header>
   );
 }
