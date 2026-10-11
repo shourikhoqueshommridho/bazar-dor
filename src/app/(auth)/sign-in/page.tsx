@@ -52,20 +52,29 @@ export default function SignInPage() {
         callbackURL: "/",
       });
 
-      if (result.error) {
-        showError(
-          result.error.message ||
-            "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।"
-        );
-        return;
-      }
-toast.success("সফলভাবে লগইন হয়েছে!", {
-  autoClose: 5000,
-});
-     
+   if (result.error) {
+  showError(
+    result.error.message ||
+      "ইমেইল অথবা পাসওয়ার্ড সঠিক নয়।"
+  );
+  return;
+}
 
-      router.replace("/");
-      router.refresh();
+console.log("LOGIN SUCCESS");
+
+sessionStorage.setItem(
+  "bazardor-login-success",
+  "সফলভাবে লগইন হয়েছে!"
+);
+
+console.log(
+  "SAVED MESSAGE:",
+  sessionStorage.getItem("bazardor-login-success")
+);
+
+window.location.href = "/";
+
+     
     } catch (err) {
       console.error("Email sign-in error:", err);
 
@@ -116,6 +125,7 @@ toast.success("সফলভাবে লগইন হয়েছে!", {
   const isBusy = loading || socialLoading !== null;
 
   return (
+    
     <main className="min-h-[calc(100vh-225px)] bg-[#f0f5f1] px-4 py-10 sm:py-12">
       <div className="mx-auto w-full max-w-md">
         <div className="mb-6 text-center">
@@ -259,6 +269,7 @@ toast.success("সফলভাবে লগইন হয়েছে!", {
           </Link>
         </div>
       </div>
+     
     </main>
   );
 }
