@@ -25,7 +25,7 @@ export default function HeroSection() {
           </p>
 
           <Link
-            href="#all-products"
+            href="./AllProducts.tsx"
             className="mt-7 inline-flex items-center gap-3 rounded-xl bg-green-700 px-6 py-3.5 font-semibold text-white shadow-sm transition hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-600 focus:ring-offset-2"
           >
             <span>🛒</span>

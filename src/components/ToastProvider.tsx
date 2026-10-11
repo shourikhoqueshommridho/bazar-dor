@@ -1,33 +1,29 @@
+
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 export default function ToastProvider() {
-  const pathname = usePathname();
-
   useEffect(() => {
-    console.log("TOAST PROVIDER PATH:", pathname);
+    const showPendingToast = () => {
+      const message = sessionStorage.getItem(
+        "bazardor-login-success"
+      );
 
-    const message = sessionStorage.getItem(
-      "bazardor-login-success"
-    );
+      if (!message) return;
 
-    console.log("PENDING TOAST:", message);
-
-    if (pathname === "/" && message) {
       sessionStorage.removeItem("bazardor-login-success");
 
-      // পেজ load হওয়ার পর success toast দেখাও
-      setTimeout(() => {
-        toast.success(message, {
-          autoClose: 5000,
-        });
-      }, 300);
-    }
-  }, [pathname]);
+      toast.success(message, {
+        autoClose: 5000,
+        position: "top-right",
+      });
+    };
+
+    showPendingToast();
+  }, []);
 
   return (
     <ToastContainer

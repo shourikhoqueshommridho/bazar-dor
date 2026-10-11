@@ -60,19 +60,14 @@ export default function SignInPage() {
   return;
 }
 
-console.log("LOGIN SUCCESS");
 
 sessionStorage.setItem(
   "bazardor-login-success",
   "সফলভাবে লগইন হয়েছে!"
 );
 
-console.log(
-  "SAVED MESSAGE:",
-  sessionStorage.getItem("bazardor-login-success")
-);
+router.push("/");
 
-window.location.href = "/";
 
      
     } catch (err) {
